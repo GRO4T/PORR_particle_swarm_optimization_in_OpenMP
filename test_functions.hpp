@@ -36,6 +36,14 @@ float calculateTestFunc1CosinusPart(const std::vector<float>& args) {
     return res;
 }
 
+float calculateTestFunc2CosinusPart(const std::vector<float>& args) {
+    float res = 0;
+    for (int i = 0; i < args.size(); ++i) {
+        res += std::cos(2 * M_PI * args[i]); 
+    }
+    return res;
+}
+
 
 float testFunc1(std::vector<float> args) {
     float sum_of_x_squared = std::accumulate(args.begin(), args.end(), 0, square<float>());
@@ -43,3 +51,11 @@ float testFunc1(std::vector<float> args) {
     return 1/40.f * sum_of_x_squared + 1 - cosinus_part;
 }
 
+
+float testFunc2(std::vector<float> args) {
+    int n = args.size();
+    float sum_of_x_squared = std::accumulate(args.begin(), args.end(), 0, square<float>());
+    float first_exponent_part = 20 * std::exp(-0.2f * std::sqrt(sum_of_x_squared / n));
+    float second_exponent_part = std::exp(calculateTestFunc2CosinusPart(args) / n);
+    return first_exponent_part - second_exponent_part + 20 + std::exp(1.0);
+}
