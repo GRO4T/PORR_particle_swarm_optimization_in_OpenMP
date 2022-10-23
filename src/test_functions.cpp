@@ -1,4 +1,4 @@
-#include "test_functions.hpp"
+#include "../include/test_functions.hpp"
 
 
 double calculateTestFunc1CosinusPart(const std::vector<double>& args) {
