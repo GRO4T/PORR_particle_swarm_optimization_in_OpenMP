@@ -19,7 +19,6 @@ SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>ma
     bestResult.result = DBL_MAX;
     int loppsWithoutEpsilon = 0;
     int i_number = 0;
-    double prevValue = DBL_MAX; 
 
     // ustawienie zakresu losowania
     std::vector<std::uniform_real_distribution<double>> unifs;
@@ -42,14 +41,14 @@ SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>ma
         double result = testFunc1(x);
         if(result < bestResult.result)
         {
-            createSearchResult(x, result);
+            bestResult = createSearchResult(x, result);
         }
-        if(prevValue - epsilon >= result)
+        if(bestResult.result - epsilon >= result)
         {
             loppsWithoutEpsilon = 0;
         }
-        prevValue = result;
     }
+    return bestResult;
 }
 
 
