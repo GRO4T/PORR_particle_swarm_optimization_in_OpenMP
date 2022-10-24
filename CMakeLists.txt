@@ -13,4 +13,5 @@ add_executable(PORR
     src/random_search.cpp
     src/test_functions.cpp
     src/utilities.cpp
+    src/swarm_search.cpp
 )

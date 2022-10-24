@@ -13,14 +13,14 @@ void RandomSearch::setSeed(int seed /*= time(NULL)*/)
     random_engine = std::default_random_engine(seed);
 }
 
-SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>maxX, int iterations /* = -1*/)
+SearchResult RandomSearch::search(std::vector<double>&minX, std::vector<double>&maxX, size_t iterations)
 {
     assert((minX.size() == maxX.size()) && "Different dimensions in range of domain");
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     SearchResult bestResult;
     bestResult.result = DBL_MAX;
     // int loppsWithoutEpsilon = 0;
-    int i_number = 0;
+    size_t i_number = 0;
 
     // ustawienie zakresu losowania
     std::vector<std::uniform_real_distribution<double>> unifs;
