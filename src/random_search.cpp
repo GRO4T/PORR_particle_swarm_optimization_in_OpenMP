@@ -4,6 +4,7 @@
 
 #include <float.h>
 #include <cassert>
+#include <chrono>
 
 std::default_random_engine RandomSearch::random_engine;
 
@@ -12,12 +13,13 @@ void RandomSearch::setSeed(int seed /*= time(NULL)*/)
     random_engine = std::default_random_engine(seed);
 }
 
-SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>maxX, double epsilon, int iterations /* = -1*/)
+SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>maxX, int iterations /* = -1*/)
 {
     assert((minX.size() == maxX.size()) && "Different dimensions in range of domain");
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     SearchResult bestResult;
     bestResult.result = DBL_MAX;
-    int loppsWithoutEpsilon = 0;
+    // int loppsWithoutEpsilon = 0;
     int i_number = 0;
 
     // ustawienie zakresu losowania
@@ -28,10 +30,10 @@ SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>ma
     }
 
 
-    while(LOOPS_WITHOUT_EPSILON_TO_STOP > loppsWithoutEpsilon && (iterations == -1 || i_number < iterations))
+    while(/*LOOPS_WITHOUT_EPSILON_TO_STOP > loppsWithoutEpsilon && (iterations == -1 || */i_number < iterations/*)*/)
     {
         i_number++;
-        loppsWithoutEpsilon++;
+        // loppsWithoutEpsilon++;
 
         std::vector<double>x;
         for(auto unif : unifs)
@@ -39,15 +41,16 @@ SearchResult RandomSearch::search(std::vector<double>minX, std::vector<double>ma
             x.push_back(unif(random_engine));
         }
         double result = testFunc1(x);
+        // if(bestResult.result - epsilon >= result)
+        // {
+        //     loppsWithoutEpsilon = 0;
+        // }
         if(result < bestResult.result)
         {
             bestResult = createSearchResult(x, result);
         }
-        if(bestResult.result - epsilon >= result)
-        {
-            loppsWithoutEpsilon = 0;
-        }
     }
+    bestResult.time = std::chrono::duration_cast<std::chrono::nanoseconds> (std::chrono::steady_clock::now() - begin).count();
     return bestResult;
 }
 

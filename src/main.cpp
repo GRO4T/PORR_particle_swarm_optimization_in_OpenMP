@@ -10,6 +10,11 @@ int main()
     std::vector<double>maxX = {40, 40};
     //ustawienie seedu wyszukiwania losowego
     RandomSearch::setSeed();
-    SearchResult tmp = RandomSearch::search(minX, maxX, 0.1);
+    SearchResult tmp = RandomSearch::search(minX, maxX, LOOPS_NUMBER);
     cout << tmp.result << "\n";
+    cout << "{";
+    for(auto x : tmp.x)
+        cout << x << ", ";
+    cout << "}\n";
+    cout << tmp.time << "[ns]\n";
 }
