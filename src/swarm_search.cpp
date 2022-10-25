@@ -6,9 +6,11 @@
 #include <cassert>
 #include <chrono>
 
+thread_local std::mt19937 SwarmSearch::random_engine;
+
 void SwarmSearch::setSeed(int seed /*= time(NULL)*/)
 {
-    random_engine = std::default_random_engine(seed);
+    random_engine = std::mt19937(seed);
 }
 
 SearchResult SwarmSearch::search(std::vector<double>&minX, std::vector<double>&maxX, size_t particlesNumber, size_t iterations)

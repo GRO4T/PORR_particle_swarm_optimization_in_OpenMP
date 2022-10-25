@@ -22,7 +22,7 @@ public:
     SwarmSearch(int seed) {setSeed(seed);};
     void setSeed(int seed = time(NULL));
     SearchResult search(std::vector<double>&minX, std::vector<double>&maxX, size_t particlesNumber, size_t iterations);
-    std::default_random_engine random_engine;
+    static thread_local std::mt19937 random_engine;
 private:
     SearchResult bestGlobalResult;
     std::vector<Particle>particles;

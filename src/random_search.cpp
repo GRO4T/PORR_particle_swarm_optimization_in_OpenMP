@@ -6,11 +6,11 @@
 #include <cassert>
 #include <chrono>
 
-std::default_random_engine RandomSearch::random_engine;
+thread_local std::mt19937 RandomSearch::random_engine;
 
 void RandomSearch::setSeed(int seed /*= time(NULL)*/)
 {
-    random_engine = std::default_random_engine(seed);
+    random_engine = std::mt19937(seed);
 }
 
 SearchResult RandomSearch::search(std::vector<double>&minX, std::vector<double>&maxX, size_t iterations)

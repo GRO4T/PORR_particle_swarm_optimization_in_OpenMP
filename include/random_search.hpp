@@ -11,7 +11,7 @@ class RandomSearch
 public:
     static void setSeed(int seed = time(NULL));
     static SearchResult search(std::vector<double>&minX, std::vector<double>&maxX, size_t iterations);
-    static std::default_random_engine random_engine;
+    static thread_local std::mt19937 random_engine;
 private:
     
 
