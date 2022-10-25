@@ -6,6 +6,10 @@
 
 #define LOOPS_NUMBER 1000000
 
+#define  OPENMP_ENABLED // wykomentować jeśli nie chcemy zrównoleglenia
+
+#define OMP_NUM_THREADS 4
+
 struct SearchResult
 {
     std::vector<double>x;

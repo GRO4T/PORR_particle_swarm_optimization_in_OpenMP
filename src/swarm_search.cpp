@@ -5,6 +5,7 @@
 #include <float.h>
 #include <cassert>
 #include <chrono>
+#include <omp.h>
 
 thread_local std::mt19937 SwarmSearch::random_engine;
 
@@ -23,8 +24,14 @@ SearchResult SwarmSearch::search(std::vector<double>&minX, std::vector<double>&m
 
     init(particlesNumber, minX, maxX);
 
+    #ifdef OPENMP_ENABLED
+        #pragma omp parallel for shared(bestGlobalResult, c1) num_threads(OMP_NUM_THREADS)
+    #endif
     for(size_t i = 0; i < iterations; ++i)
     {
+        #ifdef OPENMP_ENABLED
+            #pragma omp parallel for shared(bestGlobalResult, c1) num_threads(OMP_NUM_THREADS)
+        #endif
         for(size_t j = 0; j < particlesNumber; ++j)
         {
             updateParticle(particles[j]);
@@ -55,6 +62,10 @@ void SwarmSearch::init(size_t particlesNumber, std::vector<double>&minX, std::ve
 
 void SwarmSearch::updateParticle(Particle& particle)
 {
+    // to nie poprawiło wydajności
+    // #ifdef OPENMP_ENABLED
+    //     #pragma omp parallel for shared(particle)
+    // #endif
     for(size_t i = 0; i < particle.position.size(); ++i)
     {
         particle.position[i] += particle.velocity[i];
@@ -70,16 +81,26 @@ void SwarmSearch::updateParticle(Particle& particle)
         particle.bestLocalResult.result = result;
         particle.bestLocalResult.x = particle.position;
     }
-    if(result < bestGlobalResult.result)
+    #ifdef OPENMP_ENABLED
+    #pragma omp critical
     {
-        bestGlobalResult.result = result;
-        bestGlobalResult.x = particle.position;
+    #endif
+        if(result < bestGlobalResult.result)
+        {
+            bestGlobalResult.result = result;
+            bestGlobalResult.x = particle.position;
+        }
+    #ifdef OPENMP_ENABLED
     }
+    #endif
     updateVelocity(particle);
 }
 
 void SwarmSearch::updateVelocity(Particle& particle)
 {
+    #ifdef OPENMP_ENABLED
+        #pragma omp parallel for shared(particle) num_threads(OMP_NUM_THREADS)
+    #endif
     for(size_t i = 0; i < particle.velocity.size(); ++i)
     {
         double r1 = unif01(random_engine), r2 = unif01(random_engine), r3 = unif01(random_engine);

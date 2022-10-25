@@ -7,7 +7,9 @@ double calculateTestFunc1CosinusPart(const std::vector<double>& args) {
     
     int i = 1;
     double res = std::cos(args[0] / (double)1);
-    for (int i = 2; i < args.size() + 1; ++i) {
+    int N = args.size();
+    // #pragma omp parallel for shared(N) private(i) reduction(* : res) //<- coś jest nie tak bo to spowalnia liczenie
+    for (i = 2; i < N + 1; ++i) {
         res *= std::cos(args[i-1] / i); 
     }
     return res;

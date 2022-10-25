@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.16.3)
 
 project(PORR)
 
-add_compile_options(-std=c++11 -I/usr/include/python3.8 -lpython3.8 -Wall)
+add_compile_options(-fopenmp -std=c++11 -I/usr/include/python3.8 -lpython3.8 -Wall )
+
+add_link_options(-fopenmp)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
