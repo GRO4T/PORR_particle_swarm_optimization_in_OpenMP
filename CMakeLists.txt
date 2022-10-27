@@ -33,20 +33,30 @@ add_executable(test_func1_3d_plot
     src/test_functions.cpp
     src/plots.cpp
 )
+target_link_libraries(test_func1_3d_plot PRIVATE python3.10)
+target_include_directories(test_func1_3d_plot PRIVATE 
+    ${PROJECT_SOURCE_DIR}/include
+    /usr/include/python3.10
+)
 
 add_executable(test_func2_3d_plot
     src/programs/test_func2_3d_plot.cpp
     src/test_functions.cpp
     src/plots.cpp
 )
-
-target_link_libraries(test_func1_3d_plot PRIVATE python3.10)
 target_link_libraries(test_func2_3d_plot PRIVATE python3.10)
-target_include_directories(test_func1_3d_plot PRIVATE 
+target_include_directories(test_func2_3d_plot PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     /usr/include/python3.10
 )
-target_include_directories(test_func2_3d_plot PRIVATE
+
+add_executable(test_func1_2d_colormap
+    src/programs/test_func1_2d_colormap.cpp
+    src/test_functions.cpp
+    src/plots.cpp
+)
+target_link_libraries(test_func1_2d_colormap PRIVATE python3.10)
+target_include_directories(test_func1_2d_colormap PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     /usr/include/python3.10
 )

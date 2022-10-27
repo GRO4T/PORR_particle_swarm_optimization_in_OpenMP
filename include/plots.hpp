@@ -3,6 +3,9 @@
 
 #include <functional>
 
-void display3DSurfacePlot(std::function<double(std::vector<double>)> func);
+using TestFunction = std::function<double(std::vector<double>)>;
+
+void display3DSurfacePlot(TestFunction func);
+void display2DColormap(TestFunction func);
 
 #endif
