@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 11)
 ####################################
 
 add_executable(PORR 
-    src/main.cpp
+    src/programs/main.cpp
     src/random_search.cpp
     src/test_functions.cpp
     src/utilities.cpp
@@ -28,23 +28,25 @@ target_include_directories(PORR PRIVATE
 # Plots
 ####################################
 
-add_executable(plot_test_func1
-    src/plot_test_func1.cpp
+add_executable(test_func1_3d_plot
+    src/programs/test_func1_3d_plot.cpp
     src/test_functions.cpp
+    src/plots.cpp
 )
 
-add_executable(plot_test_func2
-    src/plot_test_func2.cpp
+add_executable(test_func2_3d_plot
+    src/programs/test_func2_3d_plot.cpp
     src/test_functions.cpp
+    src/plots.cpp
 )
 
-target_link_libraries(plot_test_func1 PRIVATE python3.10)
-target_link_libraries(plot_test_func2 PRIVATE python3.10)
-target_include_directories(plot_test_func1 PRIVATE 
+target_link_libraries(test_func1_3d_plot PRIVATE python3.10)
+target_link_libraries(test_func2_3d_plot PRIVATE python3.10)
+target_include_directories(test_func1_3d_plot PRIVATE 
     ${PROJECT_SOURCE_DIR}/include
     /usr/include/python3.10
 )
-target_include_directories(plot_test_func2 PRIVATE
+target_include_directories(test_func2_3d_plot PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     /usr/include/python3.10
 )
