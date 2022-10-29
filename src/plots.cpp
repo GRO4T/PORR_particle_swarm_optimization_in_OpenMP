@@ -1,7 +1,10 @@
-#include "matplotlibcpp.h"
 #include <chrono>
 
 #include "plots.hpp"
+#include "random_search.hpp"
+#include "test_functions.hpp"
+
+#include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
 
@@ -24,34 +27,41 @@ void display3DSurfacePlot(TestFunction func) {
     plt::show();
 }
 
-void display2DColormap(TestFunction func, std::future<void> exit_signal_future) {
-    std::vector<std::vector<double>> x, y, z;
-    for (double i = -40; i <= 40;  i += 0.25) {
+void plotClear() {
+    plt::clf();
+}
+
+void plotContourWithBestAndCurrentPoint(
+    TestFunction objective_func,
+    const Point& best_point,
+    const Point& current_point,
+    double min_x,
+    double max_x,
+    double animation_speed
+) {
+    // utworzenie współrzędnych do wygenerowania konturu
+    std::vector<Point> contour_x, contour_y, contour_z;
+    double contour_step = 0.25;
+    for (double i = min_x; i <= max_x;  i += contour_step) {
         std::vector<double> x_row, y_row, z_row;
-        for (double j = -40; j <= 40; j += 0.25) {
+        for (double j = min_x; j <= max_x; j += contour_step) {
             x_row.push_back(i);
             y_row.push_back(j);
-            double value = func({i,j});
+            double value = objective_func({i,j});
             z_row.push_back(value);
         }
-        x.push_back(x_row);
-        y.push_back(y_row);
-        z.push_back(z_row);
+        contour_x.push_back(x_row);
+        contour_y.push_back(y_row);
+        contour_z.push_back(z_row);
     }
 
-    int i = 0;
-    while (exit_signal_future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-        plt::clf();
-        std::vector<double> min_points_x = {i * 0.1};
-        std::vector<double> min_points_y = {i * 0.1};
-
-        plt::contourf(x, y, z);
-        plt::plot(min_points_x, min_points_y, "ro");
-
-        plt::pause(0.01);
-        
-        i++;
-    }
-
-    plt::close();
+    plt::contourf(contour_x, contour_y, contour_z);
+    auto plot_point = [](const Point& point, const std::string& color) {
+        std::vector<double> x {point[0]};
+        std::vector<double> y {point[1]};
+        plt::plot(x, y, color);
+    };
+    plot_point(current_point, "bo");
+    plot_point(best_point, "ro");
+    plt::pause(1.0 / animation_speed);
 }

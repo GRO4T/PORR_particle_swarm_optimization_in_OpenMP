@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_executable(PORR 
     src/programs/main.cpp
+    src/plots.cpp
     src/random_search.cpp
     src/test_functions.cpp
     src/utilities.cpp
@@ -22,7 +23,10 @@ target_link_options(PORR PRIVATE -fopenmp)
 
 target_include_directories(PORR PRIVATE
     ${PROJECT_SOURCE_DIR}/include
+    /usr/include/python3.10
 )
+
+target_link_libraries(PORR PRIVATE python3.10)
 
 ####################################
 # Plots
@@ -54,7 +58,11 @@ add_executable(test_func1_2d_colormap
     src/programs/test_func1_2d_colormap.cpp
     src/test_functions.cpp
     src/plots.cpp
+    src/random_search.cpp
 )
+target_compile_options(test_func1_2d_colormap PRIVATE -fopenmp -Wall)
+
+target_link_options(test_func1_2d_colormap PRIVATE -fopenmp)
 target_link_libraries(test_func1_2d_colormap PRIVATE python3.10)
 target_include_directories(test_func1_2d_colormap PRIVATE
     ${PROJECT_SOURCE_DIR}/include

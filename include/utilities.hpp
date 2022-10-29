@@ -10,14 +10,14 @@
 
 #define OMP_NUM_THREADS 4
 
+using Point = std::vector<double>;
+
 struct SearchResult
 {
-    std::vector<double>x;
+    Point x;
     double result;
     unsigned long long time;
 };
-
-SearchResult createSearchResult(std::vector<double>x, double result);
 
 
 #endif
