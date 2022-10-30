@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     } else if (search_algorithm == "swarm") {
         int particle_count = 100;
         SwarmSearch swarmSearch(objective_func, n, particle_count, threads);
-        SearchResult searchResult2 = swarmSearch.search(iterations);
+        search_result = swarmSearch.search(iterations);
     }
 
     std::cout << "Search: " << search_algorithm << std::endl;

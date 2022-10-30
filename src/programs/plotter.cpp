@@ -35,6 +35,13 @@ int main(int argc, char** argv)
         }
     }
 
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "n: " << n << std::endl;
+    std::cout << "iterations: " << iterations << std::endl;
+    std::cout << "search_algorithm: " << search_algorithm << std::endl;
+    std::cout << "objective_func_id: " << objective_func_id << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+
     ObjectiveFunc objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
 
     auto random_search_2d = [](int iterations, ObjectiveFunc obj_func) {
