@@ -3,16 +3,32 @@
 #include <vector>
 #include <iostream>
 #include "test_functions.hpp"
+#include <string.h>
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-    std::vector<double> min_x = {-40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40};
-    std::vector<double> max_x = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40};
-    //ustawienie seedu wyszukiwania losowego
-    RandomSearch random_search(testFunc1, 20, 1);
-    SearchResult searchResult1 = random_search.search(LOOPS_NUMBER);
+    int n = 20;
+    int threads = 4;
+    int iterations = 100000;
+
+    for (int i = 0; i < argc; ++i) {
+        if (strcmp(argv[i], "-n") == 0) {
+            n = stoi(argv[i+1]);
+        } else if (strcmp(argv[i], "--threads") == 0) {
+            threads = stoi(argv[i+1]);
+        } else if (strcmp(argv[i], "--iterations") == 0) {
+            iterations = stoi(argv[i+1]);
+        }
+    }
+
+    std::cout << "n: " << n << std::endl;
+    std::cout << "threads: " << threads << std::endl;
+    std::cout << "iterations: " << iterations << std::endl;
+
+    RandomSearch random_search(testFunc1, n, threads);
+    SearchResult searchResult1 = random_search.search(iterations);
 
     cout << "Wyszukiwanie losowe:\n";
     cout << "Najlepszy wynik: " << searchResult1.result << "\n";
@@ -22,9 +38,10 @@ int main()
     cout << "}\n";
     cout << searchResult1.time << "[ns]\n";
 
-    SwarmSearch swarmSearch;
-    
-    SearchResult searchResult2 = swarmSearch.search(min_x, max_x, 10000, LOOPS_NUMBER / 14000); // dzielę przez 14000 aby wyrównać czasy obu metod
+    int particle_count = 100;
+    SwarmSearch swarmSearch(testFunc1, n, particle_count, threads);
+    SearchResult searchResult2 = swarmSearch.search(iterations);
+
     cout << "Wyszukiwanie rojem cząstek:\n";
     cout << "Najlepszy wynik: " << searchResult2.result << "\n";
     cout << "{";

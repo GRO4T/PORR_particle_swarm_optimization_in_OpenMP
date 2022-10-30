@@ -29,9 +29,9 @@ public:
     static thread_local std::mt19937 random_engine;
 
 private:
-    int threads;
     std::function<double(Point)> objective_func;
-    int n;
+    size_t n;
+    int threads;
     double min_x;
     double max_x;
 };
