@@ -8,6 +8,7 @@
 using namespace std;
 
 void print_as_json(const SearchResult& search_result);
+void print_help();
 
 int main(int argc, char** argv)
 {
@@ -18,17 +19,20 @@ int main(int argc, char** argv)
     std::string search_algorithm = "random";
 
     for (int i = 0; i < argc; ++i) {
-        if (strcmp(argv[i], "-n") == 0) {
+        if ((strcmp(argv[i], "-n") == 0) || (strcmp(argv[i], "--dimension") == 0)) {
             n = stoi(argv[i+1]);
-        } else if (strcmp(argv[i], "--threads") == 0) {
+        } else if ((strcmp(argv[i], "-t") == 0) || (strcmp(argv[i], "--threads") == 0)) {
             threads = stoi(argv[i+1]);
-        } else if (strcmp(argv[i], "--iterations") == 0) {
+        } else if ((strcmp(argv[i], "-i") == 0) || (strcmp(argv[i], "--iterations") == 0)) {
             iterations = stoi(argv[i+1]);
-        } else if (strcmp(argv[i], "--search") == 0) {
-            search_algorithm = stoi(argv[i+1]);
-        } else if (strcmp(argv[i], "--obj_func") == 0) {
+        } else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--search") == 0)) {
+            search_algorithm = argv[i+1];
+        } else if ((strcmp(argv[i], "-f") == 0) || (strcmp(argv[i], "--obj_func") == 0)) {
             objective_func_id = stoi(argv[i+1]);
-        } 
+        } else if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
+            print_help();
+            exit(0);
+        }
     }
 
     std::cout << "---------------------------------------" << std::endl;
@@ -68,4 +72,9 @@ void print_as_json(const SearchResult& search_result) {
     std::cout << "\t\"exec_time\": " << search_result.time / 1000000000.0 << "\n";
 
     std::cout << "}\n";
+}
+
+void print_help() {
+    std::cout << "usage: PORR [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
+              << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n";
 }
