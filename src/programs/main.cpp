@@ -11,14 +11,8 @@ int main()
     std::vector<double> min_x = {-40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40};
     std::vector<double> max_x = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40};
     //ustawienie seedu wyszukiwania losowego
-    RandomSearch::setSeed();
-
-    SearchResult searchResult1 = RandomSearch::search(
-        testFunc1,
-        min_x,
-        max_x,
-        LOOPS_NUMBER
-    );
+    RandomSearch random_search(testFunc1, 20, 1);
+    SearchResult searchResult1 = random_search.search(LOOPS_NUMBER);
 
     cout << "Wyszukiwanie losowe:\n";
     cout << "Najlepszy wynik: " << searchResult1.result << "\n";

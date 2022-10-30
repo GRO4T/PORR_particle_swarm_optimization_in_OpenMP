@@ -10,22 +10,28 @@
 
 thread_local std::mt19937 RandomSearch::random_engine;
 
+RandomSearch::RandomSearch(
+    std::function<double(Point)> objective_func,
+    size_t n,
+    int threads,
+    double min_x,
+    double max_x,
+    int seed
+):      objective_func(objective_func),
+        n(n),
+        threads(threads),
+        min_x(min_x),
+        max_x(max_x) {
+    setSeed(seed);
+    omp_set_num_threads(threads);
+}
+
 void RandomSearch::setSeed(int seed /*= time(NULL)*/)
 {
     random_engine = std::mt19937(seed);
 }
 
-SearchResult RandomSearch::search(
-    std::function<double(Point)> objective_func,
-    Point& min_x,
-    Point& max_x,
-    size_t iterations
-)
-{
-    assert((min_x.size() == max_x.size()) && "Different dimensions in range of domain");
-
-    omp_set_num_threads(8); // TODO w utilities jest stała określająca liczbę wątków
-
+SearchResult RandomSearch::search(size_t iterations) {
     auto begin = std::chrono::steady_clock::now();
 
     double best_result = DBL_MAX;
@@ -33,23 +39,23 @@ SearchResult RandomSearch::search(
 
     // ustawienie zakresu losowania
     std::vector<std::uniform_real_distribution<double>> unifs;
-    for(unsigned int i = 0; i < min_x.size(); ++i)
+    for(size_t i = 0; i < n; ++i)
     {
-        unifs.push_back(std::uniform_real_distribution<double>(min_x[i], max_x[i]));
+        unifs.push_back(std::uniform_real_distribution<double>(min_x, max_x));
     }
 
     #ifdef OPENMP_ENABLED
-        #pragma omp parallel for shared(best_result, best_position, unifs) num_threads(OMP_NUM_THREADS)
+        #pragma omp parallel for shared(best_result, best_position, unifs) 
     #endif
     for(std::size_t i = 0; i < iterations; ++i)
     {
-        std::vector<double> random_point;
+        std::vector<double> current_point;
         for(auto unif : unifs)
         {
-            random_point.push_back(unif(random_engine));
+            current_point.push_back(unif(random_engine));
         }
 
-        double result = objective_func(random_point);
+        double result = objective_func(current_point);
 
         #ifdef OPENMP_ENABLED
         #pragma omp critical
@@ -58,7 +64,7 @@ SearchResult RandomSearch::search(
             if(result < best_result)
             {
                 best_result = result;
-                best_position = random_point;
+                best_position = current_point;
             }
         #ifdef OPENMP_ENABLED
         }
@@ -71,13 +77,9 @@ SearchResult RandomSearch::search(
     return SearchResult({best_position, best_result, exec_time});
 }
 
-void RandomSearch::plot(
-    std::function<double(Point)> objective_func,
-    double min_x,
-    double max_x,
-    size_t iterations,
-    double animation_speed  
-) {
+void RandomSearch::plot(size_t iterations, double animation_speed) {
+    assert(n == 2);
+
     double best_result = DBL_MAX;
     Point best_position;
 
