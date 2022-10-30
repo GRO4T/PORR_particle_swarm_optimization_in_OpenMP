@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "utilities.hpp"
+
 
 template<typename T>
 struct square
@@ -27,14 +29,14 @@ struct multiply_cosinus
 };
 
 
-double calculateTestFunc1CosinusPart(const std::vector<double>& args);
+double calculateTestFunc1CosinusPart(const Point& point);
 
-double calculateTestFunc2CosinusPart(const std::vector<double>& args);
-
-
-double testFunc1(std::vector<double> args);
+double calculateTestFunc2CosinusPart(const Point& point);
 
 
-double testFunc2(std::vector<double> args);
+double testFunc1(Point point);
+
+
+double testFunc2(Point point);
 
 #endif

@@ -3,18 +3,37 @@
 
 #include <time.h>
 #include <random>
+#include <functional>
+#include <future>
 
 #include "utilities.hpp"
 
 class RandomSearch
 {
 public:
-    static void setSeed(int seed = time(NULL));
-    static SearchResult search(std::vector<double>&minX, std::vector<double>&maxX, size_t iterations);
-    static thread_local std::mt19937 random_engine;
-private:
-    
+    RandomSearch(
+        std::function<double(Point)> objective_func,
+        size_t n,
+        int threads = 4,
+        double min_x = -40,
+        double max_x = 40,
+        int seed = time(NULL)
+    );
 
+    void setSeed(int seed = time(NULL));
+
+    SearchResult search(size_t iterations);
+
+    void plot(size_t iterations, double animation_speed = 1.0 / 0.01);
+
+    static thread_local std::mt19937 random_engine;
+
+private:
+    std::function<double(Point)> objective_func;
+    size_t n;
+    int threads;
+    double min_x;
+    double max_x;
 };
 
 

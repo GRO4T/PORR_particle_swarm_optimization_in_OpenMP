@@ -9,48 +9,64 @@
 
 thread_local std::mt19937 SwarmSearch::random_engine;
 
+SwarmSearch::SwarmSearch(
+    std::function<double(Point)> objective_func,
+    size_t n,
+    size_t particle_count,
+    int threads,
+    double min_x,
+    double max_x,
+    int seed
+):      objective_func(objective_func),
+        n(n),
+        particle_count(particle_count),
+        threads(threads),
+        min_x(min_x),
+        max_x(max_x) {
+    setSeed(seed);
+    omp_set_num_threads(threads);
+}
+
 void SwarmSearch::setSeed(int seed /*= time(NULL)*/)
 {
     random_engine = std::mt19937(seed);
 }
 
-SearchResult SwarmSearch::search(std::vector<double>&minX, std::vector<double>&maxX, size_t particlesNumber, size_t iterations)
+SearchResult SwarmSearch::search(size_t iterations)
 {
-    assert((minX.size() == maxX.size()) && "Different dimensions in range of domain");
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    bestGlobalResult.result = DBL_MAX;
-    for(auto x : minX)
-        bestGlobalResult.x.push_back(DBL_MAX);
+    auto begin = std::chrono::steady_clock::now();
 
-    init(particlesNumber, minX, maxX);
+    best_global_result.result = DBL_MAX;
+    for(size_t i = 0; i < n; ++i)
+        best_global_result.x.push_back(DBL_MAX);
+
+    init();
 
     #ifdef OPENMP_ENABLED
-        #pragma omp parallel for shared(bestGlobalResult, c1) num_threads(OMP_NUM_THREADS)
+        #pragma omp parallel for shared(best_global_result, c1)
     #endif
     for(size_t i = 0; i < iterations; ++i)
     {
-        #ifdef OPENMP_ENABLED
-            #pragma omp parallel for shared(bestGlobalResult, c1) num_threads(OMP_NUM_THREADS)
-        #endif
-        for(size_t j = 0; j < particlesNumber; ++j)
+        for(size_t j = 0; j < particle_count; ++j)
         {
             updateParticle(particles[j]);
         }
         c1 *= 0.992;
     }
-    
-    bestGlobalResult.time = std::chrono::duration_cast<std::chrono::nanoseconds> (std::chrono::steady_clock::now() - begin).count();
-    return bestGlobalResult;
+
+    auto end = std::chrono::steady_clock::now();
+    best_global_result.time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+    return best_global_result;
 }
 
-void SwarmSearch::init(size_t particlesNumber, std::vector<double>&minX, std::vector<double>&maxX)
+void SwarmSearch::init()
 {
-    for(size_t i = 0; i < particlesNumber; ++i)
+    for(size_t i = 0; i < particle_count; ++i)
     {
         Particle particle;
-        for(unsigned int i = 0; i < minX.size(); ++i)
+        for(size_t i = 0; i < n; ++i)
         {
-            auto unif = std::uniform_real_distribution<double>(minX[i], maxX[i]);
+            auto unif = std::uniform_real_distribution<double>(min_x, max_x);
             particle.position.push_back(unif(random_engine));
             particle.velocity.push_back(0.0);
             particle.bestLocalResult.x.push_back(DBL_MAX);
@@ -62,10 +78,6 @@ void SwarmSearch::init(size_t particlesNumber, std::vector<double>&minX, std::ve
 
 void SwarmSearch::updateParticle(Particle& particle)
 {
-    // to nie poprawiło wydajności
-    // #ifdef OPENMP_ENABLED
-    //     #pragma omp parallel for shared(particle)
-    // #endif
     for(size_t i = 0; i < particle.position.size(); ++i)
     {
         particle.position[i] += particle.velocity[i];
@@ -75,35 +87,38 @@ void SwarmSearch::updateParticle(Particle& particle)
         if(particle.position[i] < -40)
             particle.position[i] = -40 + (-40 - particle.position[i]);
     }
+
     double result = testFunc1(particle.position);
+
     if(result < particle.bestLocalResult.result)
     {
         particle.bestLocalResult.result = result;
         particle.bestLocalResult.x = particle.position;
     }
+
     #ifdef OPENMP_ENABLED
     #pragma omp critical
     {
     #endif
-        if(result < bestGlobalResult.result)
+        if(result < best_global_result.result)
         {
-            bestGlobalResult.result = result;
-            bestGlobalResult.x = particle.position;
+            best_global_result.result = result;
+            best_global_result.x = particle.position;
         }
     #ifdef OPENMP_ENABLED
     }
     #endif
+
     updateVelocity(particle);
 }
 
 void SwarmSearch::updateVelocity(Particle& particle)
 {
-    #ifdef OPENMP_ENABLED
-        #pragma omp parallel for shared(particle) num_threads(OMP_NUM_THREADS)
-    #endif
     for(size_t i = 0; i < particle.velocity.size(); ++i)
     {
         double r1 = unif01(random_engine), r2 = unif01(random_engine), r3 = unif01(random_engine);
-        particle.velocity[i] = c1*r1*particle.velocity[i] + c2*r2*(particle.bestLocalResult.x[i] - particle.position[i]) + c3*r3*(bestGlobalResult.x[i] - particle.position[i]);
+        particle.velocity[i] = c1*r1 * particle.velocity[i]
+                             + c2*r2 * (particle.bestLocalResult.x[i] - particle.position[i])
+                             + c3*r3 * (best_global_result.x[i] - particle.position[i]);
     }
 }
