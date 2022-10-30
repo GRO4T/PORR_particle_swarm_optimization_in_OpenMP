@@ -75,6 +75,6 @@ void print_as_json(const SearchResult& search_result) {
 }
 
 void print_help() {
-    std::cout << "usage: PORR [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
+    std::cout << "usage: runner [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
               << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n";
 }

@@ -1,6 +1,7 @@
 #include "swarm_search.hpp"
 
 #include "test_functions.hpp"
+#include "plots.hpp"
 
 #include <float.h>
 #include <cassert>
@@ -24,7 +25,6 @@ SwarmSearch::SwarmSearch(
         min_x(min_x),
         max_x(max_x) {
     setSeed(seed);
-    omp_set_num_threads(threads);
 }
 
 void SwarmSearch::setSeed(int seed /*= time(NULL)*/)
@@ -34,6 +34,8 @@ void SwarmSearch::setSeed(int seed /*= time(NULL)*/)
 
 SearchResult SwarmSearch::search(size_t iterations)
 {
+    omp_set_num_threads(threads);
+    
     auto begin = std::chrono::steady_clock::now();
 
     best_global_result.result = DBL_MAX;
@@ -120,5 +122,59 @@ void SwarmSearch::updateVelocity(Particle& particle)
         particle.velocity[i] = c1*r1 * particle.velocity[i]
                              + c2*r2 * (particle.bestLocalResult.x[i] - particle.position[i])
                              + c3*r3 * (best_global_result.x[i] - particle.position[i]);
+    }
+}
+
+void SwarmSearch::plot(size_t iterations, double animation_speed) {
+    assert(n == 2);
+
+    best_global_result.result = DBL_MAX;
+    for(size_t i = 0; i < n; ++i)
+        best_global_result.x.push_back(DBL_MAX);
+
+    init();
+
+    for(size_t i = 0; i < iterations; ++i)
+    {
+        plotClear();
+
+        for(size_t j = 0; j < particle_count; ++j)
+        {
+            Particle& particle = particles[j];
+
+            for(size_t i = 0; i < particle.position.size(); ++i)
+            {
+                particle.position[i] += particle.velocity[i];
+                // "odbijanie" od ściany
+                if(particle.position[i] > 40)
+                    particle.position[i] = 40 - (particle.position[i] - 40); // "odbijanie" od ściany
+                if(particle.position[i] < -40)
+                    particle.position[i] = -40 + (-40 - particle.position[i]);
+            }
+
+            double result = testFunc1(particle.position);
+
+            if(result < particle.bestLocalResult.result)
+            {
+                particle.bestLocalResult.result = result;
+                particle.bestLocalResult.x = particle.position;
+            }
+
+            if(result < best_global_result.result)
+            {
+                best_global_result.result = result;
+                best_global_result.x = particle.position;
+            }
+
+            updateVelocity(particle);
+        }
+        c1 *= 0.992;
+
+        std::cout << "-------------------------------" << std::endl;
+        std::cout << "iteration: " << i << std::endl;
+        std::cout << "best_result: " << best_global_result.result << std::endl;
+        std::cout << "best_position: (" << best_global_result.x[0] << ", " << best_global_result.x[1] << ")" << std::endl;
+
+        plotContourWithBestAndCurrentPoint(objective_func, best_global_result.x, best_global_result.x, min_x, max_x, animation_speed);
     }
 }

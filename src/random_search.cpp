@@ -23,7 +23,6 @@ RandomSearch::RandomSearch(
         min_x(min_x),
         max_x(max_x) {
     setSeed(seed);
-    omp_set_num_threads(threads);
 }
 
 void RandomSearch::setSeed(int seed /*= time(NULL)*/)
@@ -32,6 +31,8 @@ void RandomSearch::setSeed(int seed /*= time(NULL)*/)
 }
 
 SearchResult RandomSearch::search(size_t iterations) {
+    omp_set_num_threads(threads);
+
     auto begin = std::chrono::steady_clock::now();
 
     double best_result = DBL_MAX;
