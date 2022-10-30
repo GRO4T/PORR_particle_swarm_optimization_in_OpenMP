@@ -33,6 +33,8 @@ public:
 
     SearchResult search(size_t iterations);
 
+    void plot(size_t iterations, double animation_speed = 1.0 / 0.01);
+
     static thread_local std::mt19937 random_engine;
 private:
     std::function<double(Point)> objective_func;
