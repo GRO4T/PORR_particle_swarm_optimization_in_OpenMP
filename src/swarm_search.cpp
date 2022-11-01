@@ -175,6 +175,13 @@ void SwarmSearch::plot(size_t iterations, double animation_speed) {
         std::cout << "best_result: " << best_global_result.result << std::endl;
         std::cout << "best_position: (" << best_global_result.x[0] << ", " << best_global_result.x[1] << ")" << std::endl;
 
-        plotContourWithBestAndCurrentPoint(objective_func, best_global_result.x, best_global_result.x, min_x, max_x, animation_speed);
+        std::vector<double> x, y, u, v;
+        for (const auto& particle: particles) {
+            x.push_back(particle.position[0]);
+            y.push_back(particle.position[1]);
+            u.push_back(particle.velocity[0]);
+            v.push_back(particle.velocity[1]);
+        }
+        plotContourWithQuiver(objective_func, best_global_result.x, x, y, u, v, min_x, max_x, animation_speed);
     }
 }
