@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     };
 
     auto swarm_search_2d = [](int iterations, ObjectiveFunc obj_func) {
-        SwarmSearch swarm_search(obj_func, 2, 100);
+        SwarmSearch swarm_search(obj_func, 2, 50);
         swarm_search.plot(1000);
     };
 

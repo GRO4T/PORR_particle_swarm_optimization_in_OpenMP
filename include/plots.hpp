@@ -19,5 +19,16 @@ void plotContourWithBestAndCurrentPoint(
     double max_x,
     double animation_speed
 );
+void plotContourWithQuiver(
+    TestFunction objective_func,
+    const Point& best,
+    std::vector<double> x,
+    std::vector<double> y,
+    std::vector<double> u,
+    std::vector<double> v,
+    double min_x,
+    double max_x,
+    double animation_speed
+);
 
 #endif
