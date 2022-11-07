@@ -1,7 +1,7 @@
 #ifndef RANDOM_SEARCH
 #define RANDOM_SEARCH
 
-#include <time.h>
+#include <ctime>
 #include <random>
 #include <functional>
 #include <future>
@@ -16,11 +16,10 @@ public:
         size_t n,
         int threads = 4,
         double min_x = -40,
-        double max_x = 40,
-        int seed = time(nullptr)
+        double max_x = 40
     );
 
-    static void setSeed(int seed = time(nullptr));
+    static void setSeed(int thread_id);
 
     SearchResult search(size_t iterations);
 
@@ -35,6 +34,5 @@ private:
     double min_x;
     double max_x;
 };
-
 
 #endif

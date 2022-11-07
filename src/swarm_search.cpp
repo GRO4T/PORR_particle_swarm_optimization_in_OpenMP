@@ -7,6 +7,7 @@
 #include <cassert>
 #include <chrono>
 #include <omp.h>
+#include <unistd.h>
 
 thread_local std::mt19937 SwarmSearch::random_engine;
 
@@ -16,20 +17,19 @@ SwarmSearch::SwarmSearch(
     size_t particle_count,
     int threads,
     double min_x,
-    double max_x,
-    int seed
+    double max_x
 ):      objective_func(objective_func),
         n(n),
         particle_count(particle_count),
         threads(threads),
         min_x(min_x),
         max_x(max_x) {
-    setSeed(seed);
+    random_engine = std::mt19937(time(nullptr) + getpid());
 }
 
-void SwarmSearch::setSeed(int seed /*= time(NULL)*/)
+void SwarmSearch::setSeed(int thread_id)
 {
-    random_engine = std::mt19937(seed);
+    random_engine = std::mt19937(time(nullptr) + thread_id + getpid());
 }
 
 SearchResult SwarmSearch::search(size_t iterations)
@@ -45,6 +45,10 @@ SearchResult SwarmSearch::search(size_t iterations)
     init();
 
     #ifdef OPENMP_ENABLED
+        #pragma omp parallel
+    {
+        setSeed(omp_get_thread_num());
+    }
         #pragma omp parallel for shared(best_global_result, c1)
     #endif
     for(size_t i = 0; i < iterations; ++i)

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <chrono>
 #include <omp.h>
+#include <unistd.h>
 
 thread_local std::mt19937 RandomSearch::random_engine;
 
@@ -15,19 +16,16 @@ RandomSearch::RandomSearch(
     size_t n,
     int threads,
     double min_x,
-    double max_x,
-    int seed
+    double max_x
 ):      objective_func(objective_func),
         n(n),
         threads(threads),
         min_x(min_x),
-        max_x(max_x) {
-    setSeed(seed);
-}
+        max_x(max_x) {}
 
-void RandomSearch::setSeed(int seed /*= time(NULL)*/)
+void RandomSearch::setSeed(int thread_id)
 {
-    random_engine = std::mt19937(seed);
+    random_engine = std::mt19937(time(nullptr) + thread_id + getpid());
 }
 
 SearchResult RandomSearch::search(size_t iterations) {
@@ -46,7 +44,11 @@ SearchResult RandomSearch::search(size_t iterations) {
     }
 
     #ifdef OPENMP_ENABLED
-        #pragma omp parallel for shared(best_result, best_position, unifs) 
+        #pragma omp parallel
+    {
+        setSeed(omp_get_thread_num());
+    }
+        #pragma omp parallel for shared(best_result, best_position, unifs)
     #endif
     for(std::size_t i = 0; i < iterations; ++i)
     {
