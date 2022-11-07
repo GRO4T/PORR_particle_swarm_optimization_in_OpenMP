@@ -1,9 +1,4 @@
-#include <chrono>
-
 #include "plots.hpp"
-#include "random_search.hpp"
-#include "test_functions.hpp"
-
 #include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
@@ -14,7 +9,7 @@ void plotPoint(const Point& point, const std::string& color) {
     plt::plot(x, y, color);
 }
 
-void display3DSurfacePlot(TestFunction func) {
+void display3DSurfacePlot(const TestFunction& func) {
     std::vector<std::vector<double>> x, y, z;
     for (double i = -40; i <= 40;  i += 2) {
         std::vector<double> x_row, y_row, z_row;
@@ -38,7 +33,7 @@ void plotClear() {
 }
 
 void plotContourWithBestAndCurrentPoint(
-    TestFunction objective_func,
+    const TestFunction& objective_func,
     const Point& best_point,
     const Point& current_point,
     double min_x,
@@ -68,12 +63,12 @@ void plotContourWithBestAndCurrentPoint(
 }
 
 void plotContourWithQuiver(
-    TestFunction objective_func,
+    const TestFunction& objective_func,
     const Point& best,
-    std::vector<double> x,
-    std::vector<double> y,
-    std::vector<double> u,
-    std::vector<double> v,
+    const std::vector<double>& x,
+    const std::vector<double>& y,
+    const std::vector<double>& u,
+    const std::vector<double>& v,
     double min_x,
     double max_x,
     double animation_speed

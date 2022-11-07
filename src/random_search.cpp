@@ -3,7 +3,7 @@
 #include "utilities.hpp"
 #include "plots.hpp"
 
-#include <float.h>
+#include <cfloat>
 #include <cassert>
 #include <chrono>
 #include <omp.h>
@@ -11,7 +11,7 @@
 thread_local std::mt19937 RandomSearch::random_engine;
 
 RandomSearch::RandomSearch(
-    std::function<double(Point)> objective_func,
+    std::function<double(Point)> &objective_func,
     size_t n,
     int threads,
     double min_x,
@@ -35,14 +35,14 @@ SearchResult RandomSearch::search(size_t iterations) {
 
     auto begin = std::chrono::steady_clock::now();
 
-    double best_result = DBL_MAX;
+    auto best_result = DBL_MAX;
     Point best_position;
 
     // ustawienie zakresu losowania
     std::vector<std::uniform_real_distribution<double>> unifs;
     for(size_t i = 0; i < n; ++i)
     {
-        unifs.push_back(std::uniform_real_distribution<double>(min_x, max_x));
+        unifs.emplace_back(min_x, max_x);
     }
 
     #ifdef OPENMP_ENABLED
@@ -81,7 +81,7 @@ SearchResult RandomSearch::search(size_t iterations) {
 void RandomSearch::plot(size_t iterations, double animation_speed) {
     assert(n == 2);
 
-    double best_result = DBL_MAX;
+    auto best_result = DBL_MAX;
     Point best_position;
 
     // ustawienie zakresu losowania

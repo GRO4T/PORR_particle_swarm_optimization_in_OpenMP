@@ -1,9 +1,8 @@
 #include "random_search.hpp"
 #include "swarm_search.hpp"
-#include <vector>
 #include <iostream>
 #include "test_functions.hpp"
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 
@@ -69,7 +68,7 @@ void print_as_json(const SearchResult& search_result) {
     std::cout << "]\n";
 
     std::cout << "\t\"exec_time_in_nanos\": " << search_result.time << "\n";
-    std::cout << "\t\"exec_time\": " << search_result.time / 1000000000.0 << "\n";
+    std::cout << "\t\"exec_time\": " << (double) search_result.time / 1000000000.0 << "\n";
 
     std::cout << "}\n";
 }

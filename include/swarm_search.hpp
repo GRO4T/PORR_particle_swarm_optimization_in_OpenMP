@@ -1,10 +1,10 @@
 #ifndef SWARM_SEARCH
 #define SWARM_SEARCH
 
-#include <time.h>
+#include <ctime>
 #include <random>
 #include <vector>
-#include <float.h>
+#include <cfloat>
 #include <functional>
 
 #include "utilities.hpp"
@@ -20,16 +20,16 @@ class SwarmSearch
 {
 public:
     SwarmSearch(
-        std::function<double(Point)> objective_func,
+        std::function<double(Point)> &objective_func,
         size_t n,
         size_t particle_count,
         int threads = 4,
         double min_x = -40,
         double max_x = 40,
-        int seed = time(NULL)
+        int seed = time(nullptr)
     );
 
-    void setSeed(int seed = time(NULL));
+    static void setSeed(int seed = time(nullptr));
 
     SearchResult search(size_t iterations);
 

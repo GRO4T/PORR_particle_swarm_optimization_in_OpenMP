@@ -3,7 +3,7 @@
 #include "test_functions.hpp"
 #include "plots.hpp"
 
-#include <float.h>
+#include <cfloat>
 #include <cassert>
 #include <chrono>
 #include <omp.h>
@@ -11,7 +11,7 @@
 thread_local std::mt19937 SwarmSearch::random_engine;
 
 SwarmSearch::SwarmSearch(
-    std::function<double(Point)> objective_func,
+    std::function<double(Point)> &objective_func,
     size_t n,
     size_t particle_count,
     int threads,
@@ -66,7 +66,7 @@ void SwarmSearch::init()
     for(size_t i = 0; i < particle_count; ++i)
     {
         Particle particle;
-        for(size_t i = 0; i < n; ++i)
+        for(size_t j = 0; j < n; ++j)
         {
             auto unif = std::uniform_real_distribution<double>(min_x, max_x);
             particle.position.push_back(unif(random_engine));
@@ -142,14 +142,14 @@ void SwarmSearch::plot(size_t iterations, double animation_speed) {
         {
             Particle& particle = particles[j];
 
-            for(size_t i = 0; i < particle.position.size(); ++i)
+            for(size_t k = 0; k < particle.position.size(); ++k)
             {
-                particle.position[i] += particle.velocity[i];
+                particle.position[k] += particle.velocity[k];
                 // "odbijanie" od ściany
-                if(particle.position[i] > 40)
-                    particle.position[i] = 40 - (particle.position[i] - 40); // "odbijanie" od ściany
-                if(particle.position[i] < -40)
-                    particle.position[i] = -40 + (-40 - particle.position[i]);
+                if(particle.position[k] > 40)
+                    particle.position[k] = 40 - (particle.position[k] - 40); // "odbijanie" od ściany
+                if(particle.position[k] < -40)
+                    particle.position[k] = -40 + (-40 - particle.position[k]);
             }
 
             double result = testFunc1(particle.position);

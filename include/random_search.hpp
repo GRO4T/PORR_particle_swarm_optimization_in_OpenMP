@@ -12,15 +12,15 @@ class RandomSearch
 {
 public:
     RandomSearch(
-        std::function<double(Point)> objective_func,
+        std::function<double(Point)> &objective_func,
         size_t n,
         int threads = 4,
         double min_x = -40,
         double max_x = 40,
-        int seed = time(NULL)
+        int seed = time(nullptr)
     );
 
-    void setSeed(int seed = time(NULL));
+    static void setSeed(int seed = time(nullptr));
 
     SearchResult search(size_t iterations);
 

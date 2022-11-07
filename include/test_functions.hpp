@@ -19,16 +19,6 @@ struct square
     }
 };
 
-template<typename T>
-struct multiply_cosinus
-{
-    T operator()(const T& Left, const T& Right) const
-    {   
-        return (Left * Right*Right);
-    }
-};
-
-
 double calculateTestFunc1CosinusPart(const Point& point);
 
 double calculateTestFunc2CosinusPart(const Point& point);
