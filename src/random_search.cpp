@@ -21,11 +21,17 @@ RandomSearch::RandomSearch(
         n(n),
         threads(threads),
         min_x(min_x),
-        max_x(max_x) {}
+        max_x(max_x) 
+{
+    time_seed = std::chrono::duration_cast< std::chrono::milliseconds >(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+
+}
 
 void RandomSearch::setSeed(int thread_id)
 {
-    random_engine = std::mt19937(time(nullptr) + thread_id + getpid());
+        random_engine = std::mt19937(time_seed + thread_id);
 }
 
 SearchResult RandomSearch::search(size_t iterations) {

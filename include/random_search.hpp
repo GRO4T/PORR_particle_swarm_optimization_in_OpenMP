@@ -19,7 +19,7 @@ public:
         double max_x = 40
     );
 
-    static void setSeed(int thread_id);
+    void setSeed(int thread_id);
 
     SearchResult search(size_t iterations);
 
@@ -33,6 +33,7 @@ private:
     int threads;
     double min_x;
     double max_x;
+    uint time_seed;
 };
 
 #endif
