@@ -7,7 +7,6 @@
 #include <cassert>
 #include <chrono>
 #include <omp.h>
-#include <unistd.h>
 
 thread_local std::mt19937 SwarmSearch::random_engine;
 
@@ -24,12 +23,15 @@ SwarmSearch::SwarmSearch(
         threads(threads),
         min_x(min_x),
         max_x(max_x) {
-    random_engine = std::mt19937(time(nullptr) + getpid());
+    time_seed = std::chrono::duration_cast< std::chrono::microseconds >(
+            std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    random_engine = std::mt19937(time_seed + threads + 1);
 }
 
 void SwarmSearch::setSeed(int thread_id)
 {
-    random_engine = std::mt19937(time(nullptr) + thread_id + getpid());
+    random_engine = std::mt19937(time_seed + thread_id);
 }
 
 SearchResult SwarmSearch::search(size_t iterations)

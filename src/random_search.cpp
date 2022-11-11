@@ -7,7 +7,6 @@
 #include <cassert>
 #include <chrono>
 #include <omp.h>
-#include <unistd.h>
 
 thread_local std::mt19937 RandomSearch::random_engine;
 
