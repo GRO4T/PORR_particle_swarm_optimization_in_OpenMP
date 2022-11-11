@@ -3,7 +3,7 @@
 #include "utilities.hpp"
 #include "plots.hpp"
 
-#include <float.h>
+#include <cfloat>
 #include <cassert>
 #include <chrono>
 #include <omp.h>
@@ -11,23 +11,26 @@
 thread_local std::mt19937 RandomSearch::random_engine;
 
 RandomSearch::RandomSearch(
-    std::function<double(Point)> objective_func,
+    std::function<double(Point)> &objective_func,
     size_t n,
     int threads,
     double min_x,
-    double max_x,
-    int seed
+    double max_x
 ):      objective_func(objective_func),
         n(n),
         threads(threads),
         min_x(min_x),
-        max_x(max_x) {
-    setSeed(seed);
+        max_x(max_x) 
+{
+    time_seed = std::chrono::duration_cast< std::chrono::microseconds >(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+
 }
 
-void RandomSearch::setSeed(int seed /*= time(NULL)*/)
+void RandomSearch::setSeed(int thread_id)
 {
-    random_engine = std::mt19937(seed);
+        random_engine = std::mt19937(time_seed + thread_id);
 }
 
 SearchResult RandomSearch::search(size_t iterations) {
@@ -35,18 +38,22 @@ SearchResult RandomSearch::search(size_t iterations) {
 
     auto begin = std::chrono::steady_clock::now();
 
-    double best_result = DBL_MAX;
+    auto best_result = DBL_MAX;
     Point best_position;
 
     // ustawienie zakresu losowania
     std::vector<std::uniform_real_distribution<double>> unifs;
     for(size_t i = 0; i < n; ++i)
     {
-        unifs.push_back(std::uniform_real_distribution<double>(min_x, max_x));
+        unifs.emplace_back(min_x, max_x);
     }
 
     #ifdef OPENMP_ENABLED
-        #pragma omp parallel for shared(best_result, best_position, unifs) 
+        #pragma omp parallel
+    {
+        setSeed(omp_get_thread_num());
+    }
+        #pragma omp parallel for shared(best_result, best_position, unifs)
     #endif
     for(std::size_t i = 0; i < iterations; ++i)
     {
@@ -81,7 +88,7 @@ SearchResult RandomSearch::search(size_t iterations) {
 void RandomSearch::plot(size_t iterations, double animation_speed) {
     assert(n == 2);
 
-    double best_result = DBL_MAX;
+    auto best_result = DBL_MAX;
     Point best_position;
 
     // ustawienie zakresu losowania

@@ -3,7 +3,7 @@
 #include "test_functions.hpp"
 #include "plots.hpp"
 
-#include <float.h>
+#include <cfloat>
 #include <cassert>
 #include <chrono>
 #include <omp.h>
@@ -11,25 +11,27 @@
 thread_local std::mt19937 SwarmSearch::random_engine;
 
 SwarmSearch::SwarmSearch(
-    std::function<double(Point)> objective_func,
+    std::function<double(Point)> &objective_func,
     size_t n,
     size_t particle_count,
     int threads,
     double min_x,
-    double max_x,
-    int seed
+    double max_x
 ):      objective_func(objective_func),
         n(n),
         particle_count(particle_count),
         threads(threads),
         min_x(min_x),
         max_x(max_x) {
-    setSeed(seed);
+    time_seed = std::chrono::duration_cast< std::chrono::microseconds >(
+            std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    random_engine = std::mt19937(time_seed + threads + 1);
 }
 
-void SwarmSearch::setSeed(int seed /*= time(NULL)*/)
+void SwarmSearch::setSeed(int thread_id)
 {
-    random_engine = std::mt19937(seed);
+    random_engine = std::mt19937(time_seed + thread_id);
 }
 
 SearchResult SwarmSearch::search(size_t iterations)
@@ -45,6 +47,10 @@ SearchResult SwarmSearch::search(size_t iterations)
     init();
 
     #ifdef OPENMP_ENABLED
+        #pragma omp parallel
+    {
+        setSeed(omp_get_thread_num());
+    }
         #pragma omp parallel for shared(best_global_result, c1)
     #endif
     for(size_t i = 0; i < iterations; ++i)
@@ -66,7 +72,7 @@ void SwarmSearch::init()
     for(size_t i = 0; i < particle_count; ++i)
     {
         Particle particle;
-        for(size_t i = 0; i < n; ++i)
+        for(size_t j = 0; j < n; ++j)
         {
             auto unif = std::uniform_real_distribution<double>(min_x, max_x);
             particle.position.push_back(unif(random_engine));
@@ -142,14 +148,14 @@ void SwarmSearch::plot(size_t iterations, double animation_speed) {
         {
             Particle& particle = particles[j];
 
-            for(size_t i = 0; i < particle.position.size(); ++i)
+            for(size_t k = 0; k < particle.position.size(); ++k)
             {
-                particle.position[i] += particle.velocity[i];
+                particle.position[k] += particle.velocity[k];
                 // "odbijanie" od ściany
-                if(particle.position[i] > 40)
-                    particle.position[i] = 40 - (particle.position[i] - 40); // "odbijanie" od ściany
-                if(particle.position[i] < -40)
-                    particle.position[i] = -40 + (-40 - particle.position[i]);
+                if(particle.position[k] > 40)
+                    particle.position[k] = 40 - (particle.position[k] - 40); // "odbijanie" od ściany
+                if(particle.position[k] < -40)
+                    particle.position[k] = -40 + (-40 - particle.position[k]);
             }
 
             double result = testFunc1(particle.position);

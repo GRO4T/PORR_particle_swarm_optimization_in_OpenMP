@@ -1,9 +1,6 @@
 #include <cmath>
 #include <thread>
-#include <future>
-
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
 #include <iostream>
 
 #include "test_functions.hpp"
@@ -54,7 +51,7 @@ int main(int argc, char** argv)
         swarm_search.plot(1000);
     };
 
-    auto surface_plot_3d = [](ObjectiveFunc objective_func) {
+    auto surface_plot_3d = [](const ObjectiveFunc& objective_func) {
         display3DSurfacePlot(objective_func);
         std::terminate(); // WORKAROUND: matplotlib won't close the window
     };

@@ -1,7 +1,7 @@
 #ifndef RANDOM_SEARCH
 #define RANDOM_SEARCH
 
-#include <time.h>
+#include <ctime>
 #include <random>
 #include <functional>
 #include <future>
@@ -12,15 +12,14 @@ class RandomSearch
 {
 public:
     RandomSearch(
-        std::function<double(Point)> objective_func,
+        std::function<double(Point)> &objective_func,
         size_t n,
         int threads = 4,
         double min_x = -40,
-        double max_x = 40,
-        int seed = time(NULL)
+        double max_x = 40
     );
 
-    void setSeed(int seed = time(NULL));
+    void setSeed(int thread_id);
 
     SearchResult search(size_t iterations);
 
@@ -34,7 +33,7 @@ private:
     int threads;
     double min_x;
     double max_x;
+    uint time_seed;
 };
-
 
 #endif
