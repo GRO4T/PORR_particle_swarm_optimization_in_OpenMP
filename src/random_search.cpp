@@ -23,7 +23,7 @@ RandomSearch::RandomSearch(
         min_x(min_x),
         max_x(max_x) 
 {
-    time_seed = std::chrono::duration_cast< std::chrono::milliseconds >(
+    time_seed = std::chrono::duration_cast< std::chrono::microseconds >(
         std::chrono::system_clock::now().time_since_epoch()
     ).count();
 
