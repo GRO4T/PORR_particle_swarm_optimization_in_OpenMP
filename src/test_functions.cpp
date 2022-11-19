@@ -34,7 +34,7 @@ double testFunc1(Point point) {
 double testFunc2(Point point) {
     int n = (int) point.size();
     double sum_of_x_squared = std::accumulate(point.begin(), point.end(), 0, square<double>());
-    double first_exponent_part = 20 * std::exp(-0.2f * std::sqrt(sum_of_x_squared / n));
+    double first_exponent_part = -20 * std::exp(-0.2f * std::sqrt(sum_of_x_squared / n));
     double second_exponent_part = std::exp(calculateTestFunc2CosinusPart(point) / n);
     return first_exponent_part - second_exponent_part + 20 + std::exp(1.0);
 }
