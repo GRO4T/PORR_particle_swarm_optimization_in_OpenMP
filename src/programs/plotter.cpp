@@ -42,12 +42,12 @@ int main(int argc, char** argv)
     ObjectiveFunc objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
 
     auto random_search_2d = [](int iterations, ObjectiveFunc obj_func) {
-        RandomSearch random_search(obj_func, 2);
+        RandomSearch random_search(obj_func, 2, 1, -40, 40);
         random_search.plot(1000);
     };
 
     auto swarm_search_2d = [](int iterations, ObjectiveFunc obj_func) {
-        SwarmSearch swarm_search(obj_func, 2, 50);
+        SwarmSearch swarm_search(obj_func, 2, 50, 1, -40, 40);
         swarm_search.plot(1000);
     };
 

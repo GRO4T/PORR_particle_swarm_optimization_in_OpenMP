@@ -23,9 +23,9 @@ public:
         std::function<double(Point)> &objective_func,
         size_t n,
         size_t particle_count,
-        int threads = 4,
-        double min_x = -40,
-        double max_x = 40
+        int threads,
+        double min_x,
+        double max_x
     );
 
     void setSeed(int thread_id);

@@ -44,13 +44,14 @@ int main(int argc, char** argv)
 
     SearchResult search_result;
     ObjectiveFunc objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
+    double bound_x = objective_func_id == 1 ? 40 : 30;
 
     if (search_algorithm == "random") {
-        RandomSearch random_search(objective_func, n, threads);
+        RandomSearch random_search(objective_func, n, threads, -bound_x, bound_x);
         search_result = random_search.search(iterations);
     } else if (search_algorithm == "swarm") {
         int particle_count = 100;
-        SwarmSearch swarmSearch(objective_func, n, particle_count, threads);
+        SwarmSearch swarmSearch(objective_func, n, particle_count, threads, -bound_x, bound_x);
         search_result = swarmSearch.search(iterations);
     }
 
