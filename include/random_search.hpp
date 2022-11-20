@@ -8,6 +8,8 @@
 
 #include "utilities.hpp"
 
+using Unifs = std::vector<std::uniform_real_distribution<double>>;
+
 class RandomSearch
 {
 public:
@@ -22,6 +24,9 @@ public:
     void setSeed(int thread_id);
 
     SearchResult search(size_t iterations);
+    SearchResult searchForXSeconds(int seconds);
+
+    void forceStop() { force_stop = true; }
 
     void plot(size_t iterations, double animation_speed = 1.0 / 0.01);
 
@@ -34,6 +39,11 @@ private:
     double min_x;
     double max_x;
     uint time_seed;
+
+    bool force_stop = false;
+
+    Unifs getUnifs();
+    SearchResult searchUntilStopped();
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include <cfloat>
 #include <cassert>
 #include <chrono>
+#include <future>
 #include <omp.h>
 
 thread_local std::mt19937 RandomSearch::random_engine;
@@ -42,19 +43,14 @@ SearchResult RandomSearch::search(size_t iterations) {
     Point best_position;
 
     // ustawienie zakresu losowania
-    std::vector<std::uniform_real_distribution<double>> unifs;
-    for(size_t i = 0; i < n; ++i)
-    {
-        unifs.emplace_back(min_x, max_x);
-    }
+    auto unifs = getUnifs();
 
-    #ifdef OPENMP_ENABLED
-        #pragma omp parallel
+    #pragma omp parallel
     {
         setSeed(omp_get_thread_num());
     }
-        #pragma omp parallel for shared(best_result, best_position, unifs)
-    #endif
+    
+    #pragma omp parallel for shared(best_result, best_position, unifs)
     for(std::size_t i = 0; i < iterations; ++i)
     {
         std::vector<double> current_point;
@@ -83,6 +79,90 @@ SearchResult RandomSearch::search(size_t iterations) {
     auto exec_time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
 
     return SearchResult({best_position, best_result, exec_time});
+}
+
+SearchResult RandomSearch::searchUntilStopped() {
+    omp_set_num_threads(threads);
+
+    const auto begin = std::chrono::steady_clock::now();
+
+    auto best_result = DBL_MAX;
+    Point best_position;
+
+    // ustawienie zakresu losowania
+    auto unifs = getUnifs();
+
+    #pragma omp parallel
+    {
+        setSeed(omp_get_thread_num());
+    }
+
+    #pragma omp parallel shared(force_stop)
+    {
+        while (!force_stop) {
+            std::vector<double> current_point;
+            for(auto unif : unifs)
+            {
+                current_point.push_back(unif(random_engine));
+            }
+
+            double result = objective_func(current_point);
+
+            #ifdef OPENMP_ENABLED
+            #pragma omp critical
+            {
+            #endif
+                if(result < best_result)
+                {
+                    best_result = result;
+                    best_position = current_point;
+                }
+            #ifdef OPENMP_ENABLED
+            }
+            #endif
+        }
+    }
+    
+    auto end = std::chrono::steady_clock::now();
+    auto exec_time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+
+    return SearchResult({best_position, best_result, exec_time});
+}
+
+SearchResult RandomSearch::searchForXSeconds(int seconds) {
+    std::promise<SearchResult> search_result_promise;
+    auto search_result_future = search_result_promise.get_future();
+
+    std::thread worker([&](std::promise<SearchResult>&& search_result_promise){
+        auto search_result = this->searchUntilStopped();
+        search_result_promise.set_value(search_result);
+    }, std::move(search_result_promise));
+
+    std::thread supervisor([&](){
+        auto begin = std::chrono::steady_clock::now();
+        while (true) {
+            auto end = std::chrono::steady_clock::now();
+            double exec_time = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() / 1000.0;
+            if (exec_time > seconds) {
+                this->forceStop();
+                break;
+            }
+        }
+    });
+
+    worker.join();
+    supervisor.join();
+
+    return search_result_future.get();
+}
+
+Unifs RandomSearch::getUnifs() {
+    Unifs unifs;
+    for(size_t i = 0; i < n; ++i)
+    {
+        unifs.emplace_back(min_x, max_x);
+    }
+    return unifs;
 }
 
 void RandomSearch::plot(size_t iterations, double animation_speed) {
