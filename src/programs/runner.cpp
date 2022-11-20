@@ -75,5 +75,11 @@ void print_as_json(const SearchResult& search_result) {
 
 void print_help() {
     std::cout << "usage: runner [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
-              << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n";
+              << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n"
+              << "\tdimension - number of dimensions of test function\n"
+              << "\tthreads - number of threads\n"
+              << "\titerations - finish after X iterations\n"
+              << "\tsearch - search algorithm (random or swarm)\n"
+              << "\tobj_func - id of test function (1 or 2)\n"
+              ;
 }
