@@ -41,13 +41,13 @@ int main(int argc, char** argv)
 
     ObjectiveFunc objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
 
-    auto random_search_2d = [](int iterations, int objective_func_id) {
-        RandomSearch random_search(1, 2); // TODO fix it
+    auto random_search_2d = [](int iterations, ObjectiveFunc obj_func) {
+        RandomSearch random_search(obj_func, 2);
         random_search.plot(1000);
     };
 
-    auto swarm_search_2d = [](int iterations, int objective_func_id) {
-        SwarmSearch swarm_search(objective_func_id, 2, 50);
+    auto swarm_search_2d = [](int iterations, ObjectiveFunc obj_func) {
+        SwarmSearch swarm_search(obj_func, 2, 50);
         swarm_search.plot(1000);
     };
 
@@ -61,10 +61,10 @@ int main(int argc, char** argv)
         surface_plotter.join();
     } else if (n == 2) {
         if (search_algorithm == "random") {
-            std::thread animated_contour_plotter(random_search_2d, iterations, objective_func_id);
+            std::thread animated_contour_plotter(random_search_2d, iterations, objective_func);
             animated_contour_plotter.join();
         } else if (search_algorithm == "swarm") {
-            std::thread animated_contour_plotter(swarm_search_2d, iterations, objective_func_id);
+            std::thread animated_contour_plotter(swarm_search_2d, iterations, objective_func);
             animated_contour_plotter.join();
         }
     }

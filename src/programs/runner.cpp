@@ -3,7 +3,6 @@
 #include <iostream>
 #include "test_functions.hpp"
 #include <cstring>
-#include <optional>
 
 using namespace std;
 
@@ -16,7 +15,6 @@ int main(int argc, char** argv)
     int threads = 4;
     int iterations = 100000;
     int objective_func_id = 1;
-    std::optional<int> snapshot_frequency = std::nullopt;
     std::string search_algorithm = "random";
 
     for (int i = 0; i < argc; ++i) {
@@ -30,8 +28,6 @@ int main(int argc, char** argv)
             search_algorithm = argv[i+1];
         } else if ((strcmp(argv[i], "-f") == 0) || (strcmp(argv[i], "--obj_func") == 0)) {
             objective_func_id = stoi(argv[i+1]);
-        } else if ((strcmp(argv[i], "-p") == 0) || (strcmp(argv[i], "--snapshot_freq") == 0)) {
-            snapshot_frequency = stoi(argv[i+1]);
         } else if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
             print_help();
             exit(0);
@@ -47,17 +43,14 @@ int main(int argc, char** argv)
     std::cout << "---------------------------------------" << std::endl;
 
     SearchResult search_result;
-    double bound_x = objective_func_id == 1 ? 40 : 30;
+    ObjectiveFunc objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
 
     if (search_algorithm == "random") {
-        RandomSearch random_search(
-            objective_func_id, n, threads, bound_x,
-            -bound_x, snapshot_frequency
-        );
+        RandomSearch random_search(objective_func, n, threads);
         search_result = random_search.search(iterations);
     } else if (search_algorithm == "swarm") {
         int particle_count = 100;
-        SwarmSearch swarmSearch(objective_func_id, n, particle_count, threads);
+        SwarmSearch swarmSearch(objective_func, n, particle_count, threads);
         search_result = swarmSearch.search(iterations);
     }
 
@@ -82,12 +75,5 @@ void print_as_json(const SearchResult& search_result) {
 
 void print_help() {
     std::cout << "usage: runner [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
-              << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC [-p | --snapshot_freq] SNAPSHOT_FREQ\n"
-              << "\tdimension - number of dimensions of test function\n"
-              << "\tthreads - number of threads\n"
-              << "\titerations - finish after X iterations\n"
-              << "\tsearch - search algorithm (random or swarm)\n"
-              << "\tobj_func - id of test function (1 or 2)\n"
-              << "\tsnapshot_freq - if set, state will be set every X iterations\n"
-              ;
+              << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n";
 }

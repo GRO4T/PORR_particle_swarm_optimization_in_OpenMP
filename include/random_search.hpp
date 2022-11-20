@@ -5,7 +5,6 @@
 #include <random>
 #include <functional>
 #include <future>
-#include <optional>
 
 #include "utilities.hpp"
 
@@ -13,12 +12,11 @@ class RandomSearch
 {
 public:
     RandomSearch(
-        int objective_func_id,
+        std::function<double(Point)> &objective_func,
         size_t n,
         int threads = 4,
         double min_x = -40,
-        double max_x = 40,
-        std::optional<int> snapshot_frequency = std::nullopt
+        double max_x = 40
     );
 
     void setSeed(int thread_id);
@@ -36,12 +34,6 @@ private:
     double min_x;
     double max_x;
     uint time_seed;
-
-    std::optional<int> snapshot_frequency;
-    std::string snapshot_name;
-
-    void stateSnapshot(int iter_no, double best_result);
-    bool isSnapshotEnabled();
 };
 
 #endif
