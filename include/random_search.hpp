@@ -24,7 +24,8 @@ public:
     void setSeed(int thread_id);
 
     SearchResult search(size_t iterations);
-    SearchResult searchForXSeconds(int seconds);
+    SearchResult searchForSeconds(int seconds);
+    SearchResult searchUntilGreaterThan(double threshold);
 
     void forceStop() { force_stop = true; }
 

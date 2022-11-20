@@ -129,7 +129,7 @@ SearchResult RandomSearch::searchUntilStopped() {
     return SearchResult({best_position, best_result, exec_time});
 }
 
-SearchResult RandomSearch::searchForXSeconds(int seconds) {
+SearchResult RandomSearch::searchForSeconds(int seconds) {
     std::promise<SearchResult> search_result_promise;
     auto search_result_future = search_result_promise.get_future();
 
@@ -154,6 +154,54 @@ SearchResult RandomSearch::searchForXSeconds(int seconds) {
     supervisor.join();
 
     return search_result_future.get();
+}
+
+SearchResult RandomSearch::searchUntilGreaterThan(double threshold) {
+    omp_set_num_threads(threads);
+
+    const auto begin = std::chrono::steady_clock::now();
+
+    auto best_result = DBL_MAX;
+    Point best_position;
+
+    // ustawienie zakresu losowania
+    auto unifs = getUnifs();
+
+    #pragma omp parallel
+    {
+        setSeed(omp_get_thread_num());
+    }
+
+    #pragma omp parallel
+    {
+        while (best_result > threshold) {
+            std::vector<double> current_point;
+            for(auto unif : unifs)
+            {
+                current_point.push_back(unif(random_engine));
+            }
+
+            double result = objective_func(current_point);
+
+            #ifdef OPENMP_ENABLED
+            #pragma omp critical
+            {
+            #endif
+                if(result < best_result)
+                {
+                    best_result = result;
+                    best_position = current_point;
+                }
+            #ifdef OPENMP_ENABLED
+            }
+            #endif
+        }
+    }
+    
+    auto end = std::chrono::steady_clock::now();
+    auto exec_time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+
+    return SearchResult({best_position, best_result, exec_time});
 }
 
 Unifs RandomSearch::getUnifs() {

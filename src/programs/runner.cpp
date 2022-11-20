@@ -15,6 +15,7 @@ int main(int argc, char** argv)
     int threads = 4;
     int iterations = 100000;
     int seconds = 5;
+    double threshold = 0.9;
     int objective_func_id = 1;
     std::string search_algorithm = "random";
     std::string end_condition = "iteration";
@@ -34,6 +35,9 @@ int main(int argc, char** argv)
         } else if ((strcmp(argv[i], "-m") == 0) || (strcmp(argv[i], "--time") == 0)) {
             seconds = stoi(argv[i+1]);
             end_condition = "time";
+        } else if ((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--threshold") == 0)) {
+            threshold = stod(argv[i+1]);
+            end_condition = "threshold";
         } else if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
             print_help();
             exit(0);
@@ -53,12 +57,14 @@ int main(int argc, char** argv)
     double bound_x = objective_func_id == 1 ? 40 : 30;
 
     if (search_algorithm == "random") {
+        RandomSearch random_search(objective_func, n, threads, -bound_x, bound_x);
+
         if (end_condition == "iteration") {
-            RandomSearch random_search(objective_func, n, threads, -bound_x, bound_x);
             search_result = random_search.search(iterations);
         } else if (end_condition == "time") {
-            RandomSearch random_search(objective_func, n, threads, -bound_x, bound_x);
-            search_result = random_search.searchForXSeconds(seconds);
+            search_result = random_search.searchForSeconds(seconds);
+        } else if (end_condition == "threshold") {
+            search_result = random_search.searchUntilGreaterThan(threshold);
         }
     } else if (search_algorithm == "swarm") {
         int particle_count = 100;
@@ -88,12 +94,13 @@ void print_as_json(const SearchResult& search_result) {
 void print_help() {
     std::cout << "usage: runner [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
               << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n"
-              << "[-m | --time] TIME\n"
+              << "[-m | --time] TIME [-l | --threshold] THRESHOLD\n"
               << "\tdimension - number of dimensions of test function\n"
               << "\tthreads - number of threads\n"
               << "\titer - finish after X iterations\n"
               << "\tsearch - search algorithm (random or swarm)\n"
               << "\tobj_func - id of test function (1 or 2)\n"
               << "\ttime - finish after X seconds\n"
+              << "\tthreshold - finish after best result reaches X\n"
               ;
 }
