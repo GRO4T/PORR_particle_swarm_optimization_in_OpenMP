@@ -20,7 +20,7 @@ class SwarmSearch
 {
 public:
     SwarmSearch(
-        std::function<double(Point)> &objective_func,
+        int objective_func_id,
         size_t n,
         size_t particle_count,
         int threads = 4,

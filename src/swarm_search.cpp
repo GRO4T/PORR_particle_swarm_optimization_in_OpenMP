@@ -11,18 +11,19 @@
 thread_local std::mt19937 SwarmSearch::random_engine;
 
 SwarmSearch::SwarmSearch(
-    std::function<double(Point)> &objective_func,
+    int objective_func_id,
     size_t n,
     size_t particle_count,
     int threads,
     double min_x,
     double max_x
-):      objective_func(objective_func),
-        n(n),
+):      n(n),
         particle_count(particle_count),
         threads(threads),
         min_x(min_x),
         max_x(max_x) {
+    objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
+
     time_seed = std::chrono::duration_cast< std::chrono::microseconds >(
             std::chrono::system_clock::now().time_since_epoch()
     ).count();

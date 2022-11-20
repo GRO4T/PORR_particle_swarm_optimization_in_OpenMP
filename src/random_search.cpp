@@ -7,24 +7,39 @@
 #include <cassert>
 #include <chrono>
 #include <omp.h>
+#include <iomanip>
 
 thread_local std::mt19937 RandomSearch::random_engine;
 
 RandomSearch::RandomSearch(
-    std::function<double(Point)> &objective_func,
+    int objective_func_id,
     size_t n,
     int threads,
     double min_x,
-    double max_x
-):      objective_func(objective_func),
-        n(n),
+    double max_x,
+    std::optional<int> snapshot_frequency
+):      n(n),
         threads(threads),
         min_x(min_x),
-        max_x(max_x) 
+        max_x(max_x),
+        snapshot_frequency(snapshot_frequency)
 {
+    objective_func = objective_func_id == 1 ? testFunc1 : testFunc2;
+
     time_seed = std::chrono::duration_cast< std::chrono::microseconds >(
         std::chrono::system_clock::now().time_since_epoch()
     ).count();
+
+    if (isSnapshotEnabled()) {
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::stringstream datestring;
+        datestring << std::put_time(&tm, "%Y%m%d%H%M%S");
+
+        snapshot_name = "func" + std::to_string(objective_func_id)
+            + "_random_n" + std::to_string(n) + "_t" + std::to_string(threads) + "_" + datestring.str();
+        std::cout << snapshot_name;
+    }
 
 }
 
@@ -77,6 +92,8 @@ SearchResult RandomSearch::search(size_t iterations) {
         #ifdef OPENMP_ENABLED
         }
         #endif
+
+        stateSnapshot(int(i), best_result);
     }
 
     auto end = std::chrono::steady_clock::now();
@@ -124,5 +141,11 @@ void RandomSearch::plot(size_t iterations, double animation_speed) {
     }
 }
 
+void RandomSearch::stateSnapshot(int iter_no, double best_result) {
+    if (!isSnapshotEnabled())
+        return;
+}
 
-
+bool RandomSearch::isSnapshotEnabled() {
+    return snapshot_frequency != std::nullopt;
+}
