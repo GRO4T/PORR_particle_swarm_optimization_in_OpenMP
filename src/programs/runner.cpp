@@ -74,8 +74,14 @@ int main(int argc, char** argv)
         }
     } else if (search_algorithm == "swarm") {
         int particle_count = 100;
-        SwarmSearch swarmSearch(objective_func, n, particle_count, threads, -bound_x, bound_x);
-        search_result = swarmSearch.search(iterations);
+        SwarmSearch swarm_search(objective_func, n, particle_count, threads, -bound_x, bound_x);
+        if (end_condition == "iteration") {
+            search_result = swarm_search.search(iterations);
+        } else if (end_condition == "time") {
+            search_result = swarm_search.searchForSeconds(seconds);
+        } else if (end_condition == "threshold") {
+            search_result = swarm_search.searchUntilGreaterThan(threshold);
+        }
     }
 
     std::cout << "Search: " << search_algorithm << std::endl;

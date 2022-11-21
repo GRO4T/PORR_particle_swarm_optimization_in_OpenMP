@@ -31,8 +31,11 @@ public:
     void setSeed(int thread_id);
 
     SearchResult search(size_t iterations);
+    SearchResult searchForSeconds(int seconds);
+    SearchResult searchUntilGreaterThan(double threshold);
 
     void plot(size_t iterations, double animation_speed = 1.0 / 0.01);
+    void forceStop() { force_stop = true; }
 
     static thread_local std::mt19937 random_engine;
 private:
@@ -43,6 +46,7 @@ private:
     double min_x;
     double max_x;
     uint time_seed;
+    bool force_stop = false;
 
     double c1 = 1;
     const double c2 = 0.8, c3 = 0.8;
@@ -53,6 +57,7 @@ private:
     void init();
     void updateParticle(Particle& particle);
     void updateVelocity(Particle& particle);
+    SearchResult searchUntilStopped();
 };
 
 
