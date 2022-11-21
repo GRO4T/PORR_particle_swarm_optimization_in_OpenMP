@@ -47,7 +47,13 @@ int main(int argc, char** argv)
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "n: " << n << std::endl;
     std::cout << "threads: " << threads << std::endl;
-    std::cout << "iterations: " << iterations << std::endl;
+    if (end_condition == "iteration") {
+        std::cout << "iterations: " << iterations << std::endl;
+    } else if (end_condition == "time") {
+        std::cout << "time limit: " << seconds << " [s]" << std::endl;
+    } else if (end_condition == "threshold") {
+        std::cout << "threshold to achieve: " << threshold << std::endl;
+    }
     std::cout << "search_algorithm: " << search_algorithm << std::endl;
     std::cout << "objective_func_id: " << objective_func_id << std::endl;
     std::cout << "---------------------------------------" << std::endl;
