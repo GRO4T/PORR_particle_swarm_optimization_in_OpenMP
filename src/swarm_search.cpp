@@ -57,6 +57,7 @@ SearchResult SwarmSearch::search(size_t iterations)
 
     auto end = std::chrono::steady_clock::now();
     best_global_result.time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+    best_global_result.iterations = iterations;
     return best_global_result;
 }
 
@@ -97,9 +98,11 @@ SearchResult SwarmSearch::searchUntilStopped() {
         setSeed(omp_get_thread_num());
     }
 
-    #pragma omp parallel shared(force_stop, best_global_result, c1)
+    size_t iterations = 0;
+    #pragma omp parallel shared(force_stop, best_global_result, c1, iterations)
     {
         while (!force_stop) {
+            iterations += 1;
             for (size_t j = 0; j < particle_count; ++j) {
                 updateParticle(particles[j]);
             }
@@ -109,6 +112,7 @@ SearchResult SwarmSearch::searchUntilStopped() {
 
     auto end = std::chrono::steady_clock::now();
     best_global_result.time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+    best_global_result.iterations = iterations;
     return best_global_result;
 }
 
@@ -122,9 +126,11 @@ SearchResult SwarmSearch::searchUntilGreaterThan(double threshold) {
         setSeed(omp_get_thread_num());
     }
 
-    #pragma omp parallel shared(best_global_result, c1)
+    size_t iterations = 0;
+    #pragma omp parallel shared(best_global_result, c1, iterations)
     {
         while (best_global_result.result > threshold) {
+            iterations += 1;
             for (size_t j = 0; j < particle_count; ++j) {
                 updateParticle(particles[j]);
             }
@@ -134,6 +140,7 @@ SearchResult SwarmSearch::searchUntilGreaterThan(double threshold) {
 
     auto end = std::chrono::steady_clock::now();
     best_global_result.time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+    best_global_result.iterations = iterations;
     return best_global_result;
 }
 

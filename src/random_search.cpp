@@ -78,7 +78,7 @@ SearchResult RandomSearch::search(size_t iterations) {
     auto end = std::chrono::steady_clock::now();
     auto exec_time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
 
-    return SearchResult({best_position, best_result, exec_time});
+    return SearchResult({best_position, best_result, exec_time, iterations});
 }
 
 SearchResult RandomSearch::searchUntilStopped() {
@@ -97,9 +97,11 @@ SearchResult RandomSearch::searchUntilStopped() {
         setSeed(omp_get_thread_num());
     }
 
-    #pragma omp parallel shared(force_stop)
+    size_t iterations = 0;
+    #pragma omp parallel shared(force_stop, iterations)
     {
         while (!force_stop) {
+            iterations += 1;
             std::vector<double> current_point;
             for(auto unif : unifs)
             {
@@ -126,7 +128,7 @@ SearchResult RandomSearch::searchUntilStopped() {
     auto end = std::chrono::steady_clock::now();
     auto exec_time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
 
-    return SearchResult({best_position, best_result, exec_time});
+    return SearchResult({best_position, best_result, exec_time, iterations});
 }
 
 SearchResult RandomSearch::searchForSeconds(int seconds) {
@@ -172,9 +174,11 @@ SearchResult RandomSearch::searchUntilGreaterThan(double threshold) {
         setSeed(omp_get_thread_num());
     }
 
-    #pragma omp parallel
+    size_t iterations = 0;
+    #pragma omp parallel shared(iterations)
     {
         while (best_result > threshold) {
+            iterations += 1;
             std::vector<double> current_point;
             for(auto unif : unifs)
             {
@@ -201,7 +205,7 @@ SearchResult RandomSearch::searchUntilGreaterThan(double threshold) {
     auto end = std::chrono::steady_clock::now();
     auto exec_time = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
 
-    return SearchResult({best_position, best_result, exec_time});
+    return SearchResult({best_position, best_result, exec_time, iterations});
 }
 
 Unifs RandomSearch::getUnifs() {

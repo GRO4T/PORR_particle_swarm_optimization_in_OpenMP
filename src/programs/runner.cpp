@@ -14,6 +14,7 @@ int main(int argc, char** argv)
     int n = 20;
     int threads = 4;
     int iterations = 100000;
+    int particle_count = 100;
     int seconds = 5;
     double threshold = 0.9;
     int objective_func_id = 1;
@@ -28,6 +29,8 @@ int main(int argc, char** argv)
         } else if ((strcmp(argv[i], "-i") == 0) || (strcmp(argv[i], "--iter") == 0)) {
             iterations = stoi(argv[i+1]);
             end_condition = "iteration";
+        } else if ((strcmp(argv[i], "-p") == 0) || (strcmp(argv[i], "--particle") == 0)) {
+            particle_count = stoi(argv[i+1]);
         } else if ((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--search") == 0)) {
             search_algorithm = argv[i+1];
         } else if ((strcmp(argv[i], "-f") == 0) || (strcmp(argv[i], "--obj_func") == 0)) {
@@ -54,6 +57,7 @@ int main(int argc, char** argv)
     } else if (end_condition == "threshold") {
         std::cout << "threshold to achieve: " << threshold << std::endl;
     }
+    std::cout << "particle_count: " << particle_count << std::endl;
     std::cout << "search_algorithm: " << search_algorithm << std::endl;
     std::cout << "objective_func_id: " << objective_func_id << std::endl;
     std::cout << "---------------------------------------" << std::endl;
@@ -73,7 +77,6 @@ int main(int argc, char** argv)
             search_result = random_search.searchUntilGreaterThan(threshold);
         }
     } else if (search_algorithm == "swarm") {
-        int particle_count = 100;
         SwarmSearch swarm_search(objective_func, n, particle_count, threads, -bound_x, bound_x);
         if (end_condition == "iteration") {
             search_result = swarm_search.search(iterations);
@@ -99,13 +102,14 @@ void print_as_json(const SearchResult& search_result) {
 
     std::cout << "\t\"exec_time_in_nanos\": " << search_result.time << "\n";
     std::cout << "\t\"exec_time\": " << (double) search_result.time / 1000000000.0 << "\n";
+    std::cout << "\t\"iterations\": " << search_result.iterations << "\n";
 
     std::cout << "}\n";
 }
 
 void print_help() {
     std::cout << "usage: runner [-h | --help] [-n | --dimension] DIMENSION [-t | --threads] THREADS\n"
-              << "[-i | --iterations] ITERATIONS [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n"
+              << "[-i | --iterations] ITERATIONS [-p | --particle] PARTICLE_COUNT [-s | --search] SEARCH_ALGORITHM [-f | --obj_func] OBJ_FUNC\n"
               << "[-m | --time] TIME [-l | --threshold] THRESHOLD\n"
               << "\tdimension - number of dimensions of test function\n"
               << "\tthreads - number of threads\n"

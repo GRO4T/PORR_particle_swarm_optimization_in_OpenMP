@@ -15,6 +15,7 @@ struct SearchResult
     Point x;
     double result;
     long int time;
+    size_t iterations;
 };
 
 
