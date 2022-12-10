@@ -94,14 +94,14 @@ int main(int argc, char** argv)
 
 void print_as_json(const SearchResult& search_result) {
     cout << "{\n";
-    std::cout << "\t\"value\": " << search_result.result << "\n";
+    std::cout << "\t\"value\": " << search_result.result << ",\n";
     std::cout << "\t\"position\": [";
     for(auto x : search_result.x)
         cout << x << ", ";
-    std::cout << "]\n";
+    std::cout << "],\n";
 
-    std::cout << "\t\"exec_time_in_nanos\": " << search_result.time << "\n";
-    std::cout << "\t\"exec_time\": " << (double) search_result.time / 1000000000.0 << "\n";
+    std::cout << "\t\"exec_time_in_nanos\": " << search_result.time << ",\n";
+    std::cout << "\t\"exec_time\": " << (double) search_result.time / 1000000000.0 << ",\n";
     std::cout << "\t\"iterations\": " << search_result.iterations << "\n";
 
     std::cout << "}\n";
