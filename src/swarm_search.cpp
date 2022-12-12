@@ -234,7 +234,7 @@ void SwarmSearch::plot(size_t iterations, double animation_speed) {
                     particle.position[k] = -40 + (-40 - particle.position[k]);
             }
 
-            double result = testFunc1(particle.position);
+            double result = objective_func(particle.position);
 
             if(result < particle.bestLocalResult.result)
             {
