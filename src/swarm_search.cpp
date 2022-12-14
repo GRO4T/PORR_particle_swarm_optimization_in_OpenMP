@@ -177,7 +177,7 @@ void SwarmSearch::updateParticle(Particle& particle)
             particle.position[i] = -40 + (-40 - particle.position[i]);
     }
 
-    double result = testFunc1(particle.position);
+    double result = objective_func(particle.position);
 
     if(result < particle.bestLocalResult.result)
     {
