@@ -1,4 +1,10 @@
-# giga-swarm
+# PORR_particle_swarm_optimization_in_OpenMP_OpenACC_and_OpenMPI
+Implementacja optymalizacji rojem cząstek (oraz prostego przeszukiwania
+losowego) przy pomocy różnych technologii wspierających równoległe 
+wykonanie kodu:
+* OpenMP (gałąź master)
+* OpenACC (gałąź master-openacc)
+* OpenMPI (gałąź master-openmpi)
 
 ----
 # Kompilacja
