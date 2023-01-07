@@ -17,9 +17,9 @@ add_executable(runner
     src/swarm_search.cpp
 )
 
-target_compile_options(runner PRIVATE -fopenmp -Wall)
+target_compile_options(runner PRIVATE -fopenmp -fopenacc -Wall)
 
-target_link_options(runner PRIVATE -fopenmp)
+target_link_options(runner PRIVATE -fopenmp -fopenacc)
 
 target_include_directories(runner PRIVATE
     ${PROJECT_SOURCE_DIR}/include
@@ -39,7 +39,7 @@ add_executable(plotter
     src/random_search.cpp
     src/swarm_search.cpp
 )
-target_compile_options(plotter PRIVATE -fopenmp -Wall)
+target_compile_options(plotter PRIVATE -fopenmp -fopenacc -Wall)
 
 target_link_options(plotter PRIVATE -fopenmp)
 target_link_libraries(plotter PRIVATE python3.10)

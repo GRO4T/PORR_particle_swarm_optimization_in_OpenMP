@@ -1,0 +1,41 @@
+----------------- PORR ------------------------------------------------
+
+
+-DCMAKE_BUILD_TYPE=Debug
+
+    int NUM = 1000;
+    int buf[NUM] = {};    // initialize the buffer to 0s
+#pragma acc parallel create(buf[NUM])
+    for (int i = 0; i < NUM; ++i) {
+        buf[i] = 1;
+    }
+    if (buf[0] == 1) {
+        printf("Running on CPU\n");
+    } else {
+        printf("Running on GPU\n");
+    }
+
+--- Instalacja OpenACC
+$ wget https://developer.download.nvidia.com/hpc-sdk/22.11/nvhpc_2022_2211_Linux_x86_64_cuda_11.8.tar.gz
+$ tar xpzf nvhpc_2022_2211_Linux_x86_64_cuda_11.8.tar.gz
+$ nvhpc_2022_2211_Linux_x86_64_cuda_11.8/install
+
+$ MANPATH=$MANPATH:/opt/nvidia/hpc_sdk/Linux_x86_64/22.11/compilers/man; export MANPATH
+$ PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/22.11/compilers/bin:$PATH; export PATH
+
+$ export PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/22.11/comm_libs/mpi/bin:$PATH
+$ export MANPATH=$MANPATH:/opt/nvidia/hpc_sdk/Linux_x86_64/22.11/comm_libs/mpi/man
+
+
+https://stackoverflow.com/questions/56288294/openacc-what-does-ta-in-pgcc-compiler-mean
+https://developer.nvidia.com/blog/getting-started-openacc/
+
+https://enccs.github.io/OpenACC-CUDA-beginners/1.02_openacc-introduction/
+https://ulhpc-tutorials.readthedocs.io/en/latest/gpu/openacc/basics/
+
+export PGI_ACC_DEBUG=1
+export PGI_ACC_TIME=1
+
+
+
+pgc++ test_random_search_acc.cpp src/test_functions.cpp -acc -Minfo=all
